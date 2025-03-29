@@ -2,25 +2,29 @@ import { useState } from 'react';
 
 type DieProps = {
   sides: number;
+  onRoll?: (value: number) => void;
+  disabled?: boolean;
 };
 
-export function Die({ sides }: DieProps) {
+export function Die({ sides, onRoll, disabled }: DieProps) {
   const [face, setFace] = useState(1);
   const [rolling, setRolling] = useState(false);
 
   const imagePath = `/assets/dice/base/d${sides}.png`;
 
   function rollDie() {
-    if (rolling) return;
+    if (rolling || disabled) return;
     setRolling(true);
 
     let counter = 0;
     const interval = setInterval(() => {
-      setFace(Math.floor(Math.random() * sides) + 1);
+      const result = Math.floor(Math.random() * sides) + 1;
+      setFace(result);
       counter++;
       if (counter > 10) {
         clearInterval(interval);
         setRolling(false);
+        onRoll?.(result);
       }
     }, 50);
   }
