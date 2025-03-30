@@ -42,7 +42,7 @@ export function Die({ sides, onRoll, disabled }: DieProps) {
         />
 
         {/* Number overlay */}
-        <div className="absolute inset-0 flex items-center justify-center text-black text-3xl font-bold">
+        <div className="absolute inset-0 flex items-center justify-center text-black text-3xl font-bold select-none">
         {face}
         </div>
       </div>
