@@ -5,5 +5,5 @@ const repo = '/dice-roller-incremental/'
 
 export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: command === 'serve' ? '/' : `/${repo}/`,
+  base: command === 'serve' ? '/' : `${repo}`,
 }));
