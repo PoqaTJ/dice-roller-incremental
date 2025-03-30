@@ -10,7 +10,7 @@ export function Die({ sides, onRoll, disabled }: DieProps) {
   const [face, setFace] = useState(1);
   const [rolling, setRolling] = useState(false);
 
-  const imagePath = `/assets/dice/base/d${sides}.png`;
+  const imagePath = `${import.meta.env.BASE_URL}assets/dice/base/d${sides}.png`;
 
   function rollDie() {
     if (rolling || disabled) return;
