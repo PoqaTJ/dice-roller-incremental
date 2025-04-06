@@ -7,18 +7,20 @@ const diceTypes = [4, 6, 8, 10, 12, 20];
 export function DiceSet() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [completed, setCompleted] = useState<boolean[]>(Array(diceTypes.length).fill(false));
+  const [setCompleted, setSetCompleted] = useState(false);
 
   // Reset the set when all dice are completed
   useEffect(() => {
-    if (completed.every(isComplete => isComplete)) {
+    if (setCompleted) {
       const resetTimer = setTimeout(() => {
         setActiveIndex(0);
         setCompleted(Array(diceTypes.length).fill(false));
+        setSetCompleted(false);
       }, GameConfig.SET_RESET_DELAY_SECONDS * 1000);
 
       return () => clearTimeout(resetTimer);
     }
-  }, [completed]);
+  }, [setCompleted]);
 
   function handleRoll(index: number, result: number, sides: number) {
     if (result === sides && index === activeIndex) {
@@ -28,7 +30,9 @@ export function DiceSet() {
         return updated;
       });
 
-      if (activeIndex < diceTypes.length - 1) {
+      if (index === diceTypes.length - 1) {
+        setSetCompleted(true);
+      } else if (activeIndex < diceTypes.length - 1) {
         setActiveIndex(index + 1);
       }
     }
@@ -38,7 +42,7 @@ export function DiceSet() {
     <div className="flex flex-row gap-4 p-4 justify-center items-center">
       {diceTypes.map((sides, index) => {
         const isUnlocked = index <= activeIndex;
-        const isActive = index === activeIndex;
+        const isActive = index === activeIndex && !setCompleted;
         const isCompleted = completed[index];
 
         return (
