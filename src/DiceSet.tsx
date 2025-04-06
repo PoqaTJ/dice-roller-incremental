@@ -1,24 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Die } from './Die';
+import { GameConfig } from './Game';
+import { useGameState } from './GameState';
 
 const diceTypes = [4, 6, 8, 10, 12, 20];
 
 export function DiceSet() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [completed, setCompleted] = useState<boolean[]>(Array(diceTypes.length).fill(false));
+  const [isCompleted, setIsCompleted] = useState(false);
+  const { addPoint, addCompletionPoint, minimizeDiceSets } = useGameState();
+
+  function onReset() {
+    setActiveIndex(0);
+    setIsCompleted(false);
+  }
+
+  function onSetCompleted() {
+    addCompletionPoint();
+    setIsCompleted(true);
+    setTimeout(() => {
+      onReset();
+    }, GameConfig.SET_RESET_DELAY_SECONDS * 1000);
+  }
 
   function handleRoll(index: number, result: number, sides: number) {
-    if (result === sides && index === activeIndex) {
-      setCompleted((prev) => {
-        const updated = [...prev];
-        updated[index] = true;
-        return updated;
-      });
-
-      if (activeIndex < diceTypes.length - 1) {
-        setActiveIndex(index + 1);
-      }
+    if (result != sides) {
+      return;
     }
+
+    addPoint();
+    
+    setActiveIndex(index + 1);
+    if (index === diceTypes.length - 1) {
+      onSetCompleted();
+    }
+  }
+
+  if (minimizeDiceSets) {
+    const currentDie = diceTypes[activeIndex];
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-white text-sm">d{currentDie}</div>
+        <div style={{ width: '5rem', height: '5rem' }}>
+          <Die
+            sides={currentDie}
+            onRoll={(value) => handleRoll(activeIndex, value, currentDie)}
+            disabled={isCompleted}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -26,7 +57,6 @@ export function DiceSet() {
       {diceTypes.map((sides, index) => {
         const isUnlocked = index <= activeIndex;
         const isActive = index === activeIndex;
-        const isCompleted = completed[index];
 
         return (
           <div
@@ -34,7 +64,7 @@ export function DiceSet() {
             className={`transition-opacity duration-300 ${
               isUnlocked ? 'opacity-100' : 'opacity-0'
             }`}
-            style={{ width: '6rem', height: '6rem' }}
+            style={{ width: '5rem', height: '5rem' }}
           >
             {isUnlocked && (
               <Die
