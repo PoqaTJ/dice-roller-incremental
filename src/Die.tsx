@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Game } from './Game';
 
 type DieProps = {
   sides: number;
@@ -12,21 +13,27 @@ export function Die({ sides, onRoll, disabled }: DieProps) {
 
   const imagePath = `${import.meta.env.BASE_URL}assets/dice/base/d${sides}.png`;
 
+  function rollDuration(): number{
+    return Game.ROLL_DURATION_SECONDS;
+  }
+
   function rollDie() {
     if (rolling || disabled) return;
     setRolling(true);
 
-    let counter = 0;
+    const rollDur = rollDuration();
     const interval = setInterval(() => {
       const result = Math.floor(Math.random() * sides) + 1;
       setFace(result);
-      counter++;
-      if (counter > 10) {
-        clearInterval(interval);
-        setRolling(false);
-        onRoll?.(result);
-      }
     }, 50);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      const finalResult = Math.floor(Math.random() * sides) + 1;
+      setFace(finalResult);
+      setRolling(false);
+      onRoll?.(finalResult);
+    }, rollDur * 1000);
   }
 
   return (
