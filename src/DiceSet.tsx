@@ -1,36 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Die } from './Die';
 import { GameConfig } from './Game';
+import { useGameState } from './GameState';
 
 const diceTypes = [4, 6, 8, 10, 12, 20];
 
 export function DiceSet() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [completed, setCompleted] = useState<boolean[]>(Array(diceTypes.length).fill(false));
+  const [isCompleted, setIsCompleted] = useState(false);
+  const { addPoint, addCompletionPoint } = useGameState();
 
-  // Reset the set when all dice are completed
-  useEffect(() => {
-    if (completed.every(isComplete => isComplete)) {
-      const resetTimer = setTimeout(() => {
-        setActiveIndex(0);
-        setCompleted(Array(diceTypes.length).fill(false));
-      }, GameConfig.SET_RESET_DELAY_SECONDS * 1000);
+  function onReset() {
+    
+    setActiveIndex(0);
+    setIsCompleted(false);
+  }
 
-      return () => clearTimeout(resetTimer);
-    }
-  }, [completed]);
+  function onSetCompleted() {
+    addCompletionPoint();
+    setIsCompleted(true);
+    setTimeout(() => {
+      onReset();
+    }, GameConfig.SET_RESET_DELAY_SECONDS * 1000);
+  }
 
   function handleRoll(index: number, result: number, sides: number) {
-    if (result === sides && index === activeIndex) {
-      setCompleted((prev) => {
-        const updated = [...prev];
-        updated[index] = true;
-        return updated;
-      });
+    if (result != sides) {
+      return;
+    }
 
-      if (activeIndex < diceTypes.length - 1) {
-        setActiveIndex(index + 1);
-      }
+    addPoint();
+    
+    setActiveIndex(index + 1);
+    if (activeIndex === diceTypes.length - 1) {
+      onSetCompleted();
     }
   }
 
@@ -39,7 +42,6 @@ export function DiceSet() {
       {diceTypes.map((sides, index) => {
         const isUnlocked = index <= activeIndex;
         const isActive = index === activeIndex;
-        const isCompleted = completed[index];
 
         return (
           <div
