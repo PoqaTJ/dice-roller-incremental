@@ -8,7 +8,7 @@ const diceTypes = [4, 6, 8, 10, 12, 20];
 export function DiceSet() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const { addPoint, addCompletionPoint } = useGameState();
+  const { addPoint, addCompletionPoint, minimizeDiceSets } = useGameState();
 
   function onReset() {
     setActiveIndex(0);
@@ -34,6 +34,22 @@ export function DiceSet() {
     if (index === diceTypes.length - 1) {
       onSetCompleted();
     }
+  }
+
+  if (minimizeDiceSets) {
+    const currentDie = diceTypes[activeIndex];
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-white text-sm">d{currentDie}</div>
+        <div style={{ width: '5rem', height: '5rem' }}>
+          <Die
+            sides={currentDie}
+            onRoll={(value) => handleRoll(activeIndex, value, currentDie)}
+            disabled={isCompleted}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
