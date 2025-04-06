@@ -1,11 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Die } from './Die';
+import { GameConfig } from './Game';
 
 const diceTypes = [4, 6, 8, 10, 12, 20];
 
 export function DiceSet() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [completed, setCompleted] = useState<boolean[]>(Array(diceTypes.length).fill(false));
+
+  // Reset the set when all dice are completed
+  useEffect(() => {
+    if (completed.every(isComplete => isComplete)) {
+      const resetTimer = setTimeout(() => {
+        setActiveIndex(0);
+        setCompleted(Array(diceTypes.length).fill(false));
+      }, GameConfig.SET_RESET_DELAY_SECONDS * 1000);
+
+      return () => clearTimeout(resetTimer);
+    }
+  }, [completed]);
 
   function handleRoll(index: number, result: number, sides: number) {
     if (result === sides && index === activeIndex) {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Game } from './Game';
+import { GameConfig } from './Game';
 
 type DieProps = {
   sides: number;
@@ -14,7 +14,7 @@ export function Die({ sides, onRoll, disabled }: DieProps) {
   const imagePath = `${import.meta.env.BASE_URL}assets/dice/base/d${sides}.png`;
 
   function rollDuration(): number{
-    return Game.ROLL_DURATION_SECONDS;
+    return GameConfig.ROLL_DURATION_SECONDS;
   }
 
   function rollDie() {
