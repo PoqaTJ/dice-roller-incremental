@@ -11,7 +11,6 @@ export function DiceSet() {
   const { addPoint, addCompletionPoint } = useGameState();
 
   function onReset() {
-    
     setActiveIndex(0);
     setIsCompleted(false);
   }
@@ -32,7 +31,7 @@ export function DiceSet() {
     addPoint();
     
     setActiveIndex(index + 1);
-    if (activeIndex === diceTypes.length - 1) {
+    if (index === diceTypes.length - 1) {
       onSetCompleted();
     }
   }
@@ -49,7 +48,7 @@ export function DiceSet() {
             className={`transition-opacity duration-300 ${
               isUnlocked ? 'opacity-100' : 'opacity-0'
             }`}
-            style={{ width: '6rem', height: '6rem' }}
+            style={{ width: '5rem', height: '5rem' }}
           >
             {isUnlocked && (
               <Die
